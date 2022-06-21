@@ -70,6 +70,7 @@ namespace MonoGame_1_5
             base.Update(gameTime);
         }
 
+
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
