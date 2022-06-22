@@ -9,15 +9,26 @@ namespace MonoGame_1_5
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        Texture2D tribbleBrownTexture;
+        Texture2D gameScreenTexture;
 
-        Texture2D tribbleCreamTexture;
+        Texture2D introScreenTexture;
+
+        Texture2D gameOverTexture;
 
         Texture2D tribbleGreyTexture;
         Rectangle tribbleGreyRect;
         Vector2 tribbleGreySpeed;
 
-        Texture2D tribbleOrangeTexture;
+        private MouseState mouseState;
+
+        Screen currentScreen;
+
+        enum Screen
+        {
+            Intro,
+            PackMan,
+            Outtro
+        }
 
         public Game1()
         {
@@ -34,7 +45,7 @@ namespace MonoGame_1_5
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            tribbleGreyRect = new Rectangle(300, 10, 100, 100);
+            tribbleGreyRect = new Rectangle(0, 225, 50, 50);
             tribbleGreySpeed = new Vector2(2, 0);
 
             base.Initialize();
@@ -46,10 +57,9 @@ namespace MonoGame_1_5
 
             // TODO: use this.Content to load your game content here
             tribbleGreyTexture = Content.Load<Texture2D>("PacRight");
-            tribbleBrownTexture = Content.Load<Texture2D>("PacDown");
-            tribbleCreamTexture = Content.Load<Texture2D>("PacDown");
-            tribbleOrangeTexture = Content.Load<Texture2D>("PacDown");
-
+            introScreenTexture = Content.Load<Texture2D>("IntroScreen1");
+            gameScreenTexture = Content.Load<Texture2D>("GameScreen");
+            gameOverTexture = Content.Load<Texture2D>("GameOver");
         }
 
         protected override void Update(GameTime gameTime)
@@ -57,29 +67,73 @@ namespace MonoGame_1_5
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            tribbleGreyRect.X += (int)tribbleGreySpeed.X;
-            tribbleGreyRect.Y += (int)tribbleGreySpeed.Y;
 
-            if (tribbleGreyRect.Right > _graphics.PreferredBackBufferWidth || tribbleGreyRect.X < 0)
-                tribbleGreySpeed.X *= -1;
-            if (tribbleGreyRect.Bottom > _graphics.PreferredBackBufferHeight || tribbleGreyRect.Top < 0)
-                tribbleGreySpeed.Y *= -1;
 
-            // TODO: Add your update logic here
+            mouseState = Mouse.GetState();
 
-            base.Update(gameTime);
+
+
+            ///
+            ///draws intro screen
+            ///
+            if (currentScreen == Screen.Intro)
+            {
+                if (mouseState.LeftButton == ButtonState.Pressed)
+                    currentScreen = Screen.PackMan;
+
+
+            }
+            ///
+            /// Draws Tribble Yard
+            ///
+            else if (currentScreen == Screen.PackMan)
+            {
+                
+
+
+                tribbleGreyRect.X += (int)tribbleGreySpeed.X;
+                tribbleGreyRect.Y += (int)tribbleGreySpeed.Y;
+
+                if (tribbleGreyRect.Right > _graphics.PreferredBackBufferWidth || tribbleGreyRect.X < 0)
+                    tribbleGreySpeed.X *= -1;
+                if (tribbleGreyRect.Bottom > _graphics.PreferredBackBufferHeight || tribbleGreyRect.Top < 0)
+                    tribbleGreySpeed.Y *= -1;
+
+                // TODO: Add your update logic here
+
+                if (mouseState.RightButton == ButtonState.Pressed)
+                    currentScreen = Screen.Outtro;
+
+                base.Update(gameTime);
+            }
         }
 
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+
 
             // TODO: Add your drawing code here
             _spriteBatch.Begin();
-            _spriteBatch.Draw(tribbleGreyTexture, tribbleGreyRect, Color.White);
-            _spriteBatch.End();
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+            if (currentScreen == Screen.Intro)
+            {
+                _spriteBatch.Draw(introScreenTexture, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), Color.White);
 
+            }
+            else if (currentScreen == Screen.PackMan)
+            {
+                _spriteBatch.Draw(gameScreenTexture, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), Color.White);
+
+                _spriteBatch.Draw(tribbleGreyTexture, tribbleGreyRect, Color.White);
+            }
+            else if (currentScreen == Screen.Outtro)
+            {
+                _spriteBatch.Draw(gameOverTexture, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight), Color.White);
+
+            }
+
+            _spriteBatch.End();
             base.Draw(gameTime);
         }
     }
